@@ -1,15 +1,12 @@
 package sorokin.dev.springcore.console;
 
 import org.springframework.stereotype.Component;
-import org.w3c.dom.ls.LSOutput;
 import sorokin.dev.springcore.account.Account;
 import sorokin.dev.springcore.account.AccountService;
 import sorokin.dev.springcore.operations.OperationCommand;
 import sorokin.dev.springcore.user.User;
 import sorokin.dev.springcore.user.UserService;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -21,7 +18,7 @@ public class OperationsConsoleListener {
 
     private final UserService userService;
     private final AccountService accountService;
-    private final ConsoleInput  consoleInput;
+    private final ConsoleInput consoleInput;
 
 
     public OperationsConsoleListener(
@@ -60,20 +57,34 @@ public class OperationsConsoleListener {
                 }
 
                 switch (command) {
-                    case USER_CREATE:handleUserCreate();
+                    case USER_CREATE:
+                        handleUserCreate();
+                        continue;
 
-                    case SHOW_ALL_USERS:userService.getUsers().forEach(System.out::println);
+                    case SHOW_ALL_USERS:
+                        userService.getUsers();
+                        continue;
 
-                    case ACCOUNT_CREATE:handleAccountCreate();
-                        ;
-                    case ACCOUNT_DEPOSIT:handleDepositCreate();
-                        ;
-                    case ACCOUNT_WITHDRAW:handleWithdraw();
-                        ;
+                    case ACCOUNT_CREATE:
+                        handleAccountCreate();
+                        continue;
+
+                    case ACCOUNT_DEPOSIT:
+                        handleDepositCreate();
+                        continue;
+
+                    case ACCOUNT_WITHDRAW:
+                        handleWithdraw();
+                        continue;
+
                     case ACCOUNT_TRANSFER:
-                        ;
+                        handleTransfer();
+                        continue;
+
                     case ACCOUNT_CLOSE:
-                        ;
+                        handleClose();
+                        continue;
+
                     case EXIT:
                         return;
                     default:
@@ -86,27 +97,65 @@ public class OperationsConsoleListener {
 
     private void handleUserCreate() {
         String login = consoleInput.readString();
-        User user = userService.createUser(login);
-        System.out.println("User created: " + user);
+        userService.createUser(login);
     }
 
     private void handleAccountCreate() {
-        int userId = consoleInput.readInt();
-        Account account = accountService.createAccount(userId);
-        System.out.println("Account created: " + account);
+        try {
+            int userId = consoleInput.readInt(1);
+            Account account = userService.createAdditionalAccount(userId);
+            System.out.println("Account created: " + account);
+        } catch (IllegalStateException e) {
+            System.out.println(e.getMessage());
+        }
+
     }
 
     private void handleDepositCreate() {
-        int accountId = consoleInput.readInt();
-        int amount = consoleInput.readInt();
-        accountService.setAccountDeposit(accountId, amount);
-        System.out.println("Deposit completed successfully.");
+        int accountId = consoleInput.readInt(2);
+        int amount = consoleInput.readInt(3);
+        try {
+            accountService.setAccountDeposit(accountId, amount);
+            System.out.println("Deposit completed successfully.");
+        } catch (IllegalStateException e) {
+            System.out.println(e.getMessage());
+        }
+
     }
 
     private void handleWithdraw() {
-        int accountId = consoleInput.readInt();
-        int amount = consoleInput.readInt();
-        accountService.setAccountWithdraw(accountId, amount);
-        System.out.println("Withdrawal completed successfully.");
+        int accountId = consoleInput.readInt(6);
+        int amount = consoleInput.readInt(7);
+        try {
+            accountService.setAccountWithdraw(accountId, amount);
+            System.out.println("Withdrawal completed successfully.");
+        } catch (IllegalStateException e) {
+            System.out.println(e.getMessage());
+        }
+
+    }
+
+    private void handleTransfer() {
+        int senderAccountId = consoleInput.readInt(4);
+        int receiverAccountId = consoleInput.readInt(5);
+        int amount = consoleInput.readInt(3);
+
+        try {
+            accountService.transferMoney(senderAccountId, receiverAccountId, amount);
+        } catch (IllegalStateException e) {
+            System.out.println(e.getMessage());
+        }
+        System.out.println("Transfer completed successfully.");
+    }
+
+    private void handleClose() {
+        try {
+            int accountId = consoleInput.readInt(2);
+            accountService.closeAccount(accountId);
+            System.out.println("Account closed successfully.");
+        } catch (IllegalStateException e) {
+            System.out.println(e.getMessage());
+        }
+
     }
 }

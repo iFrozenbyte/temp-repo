@@ -9,7 +9,7 @@ import java.util.List;
 
 @Service
 public class UserService {
-    private final List<User> users = new ArrayList<>();
+    private List<User> users = new ArrayList<>();
     private final AccountService accountService;
     private int nextUserId = 1;
 
@@ -17,22 +17,50 @@ public class UserService {
         this.accountService = accountService;
     }
 
+    public void getUsers() {
+        if (users.isEmpty()) {
+            System.out.println("No users found");
+        }
+        users.forEach(System.out::println);
+    }
+
+    public void createUser(String login) {
+        try {
+            loginValidation(login);
+
+            int userId = generateId();
+            List<Account> accounts = new ArrayList<>();
+            Account defaultAccount = accountService.createAccount(userId);
+            accounts.add(defaultAccount);
+            User user = new User(userId, login, accounts);
+            users.add(user);
+            System.out.println("User created: " + user);
+
+        } catch (IllegalStateException ex) {
+            System.out.println(ex.getMessage());
+        }
+    }
+
+    public Account createAdditionalAccount(int userId) {
+        boolean isUserExist = users.stream().anyMatch(u -> u.getId() == userId);
+        if (!isUserExist) {
+            throw new IllegalStateException("User with id " + userId + " does not exist");
+        }
+        Account additionalAccount = accountService.createAccount(userId);
+        User user = users.stream().filter(u -> u.getId() == userId).findFirst().orElse(null);
+        user.getAccountList().add(additionalAccount);
+
+        return additionalAccount;
+    }
+
+    private void loginValidation(String login) {
+        boolean exists = users.stream().anyMatch(user -> user.getLogin().equals(login));
+        if (exists) {
+            throw new IllegalStateException("User with login " + login + " already exists");
+        }
+    }
+
     private int generateId() {
         return nextUserId++;
-    }
-
-    public List<User> getUsers() {
-        return new ArrayList<>(users);
-    }
-
-    public User createUser(String login) {
-        List<Account> accounts = new ArrayList<>();
-        int userId = generateId();
-        Account account = accountService.createAccount(userId);
-        accounts.add(account);
-        User user = new User(userId, login, accounts);
-        users.add(user);
-
-        return user;
     }
 }

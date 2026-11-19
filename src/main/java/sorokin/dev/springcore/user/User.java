@@ -9,6 +9,18 @@ public class User {
     String login;               // логин пользователя
     List<Account> accountList;
 
+    public int getId() {
+        return id;
+    }
+
+    public String getLogin() {
+        return login;
+    }
+
+    public List<Account> getAccountList() {
+        return accountList;
+    }
+
     public User(
             int id,
             String login,

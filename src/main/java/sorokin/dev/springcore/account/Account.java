@@ -3,7 +3,7 @@ package sorokin.dev.springcore.account;
 public class Account {
     private final int id;          // уникальный идентификатор счёта
     private final int userId;      // ID пользователя-владельца
-    private int moneyAmount; // текущий баланс
+    private double moneyAmount;       // Баланс
 
     public Account(int id, int userId, int moneyAmount) {
         this.id = id;
@@ -19,11 +19,11 @@ public class Account {
         return userId;
     }
 
-    public int getMoneyAmount() {
+    public double getMoneyAmount() {
         return moneyAmount;
     }
 
-    public void setMoneyAmount(int moneyAmount) {
+    public void setMoneyAmount(double moneyAmount) {
         this.moneyAmount = moneyAmount;
     }
 
