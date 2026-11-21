@@ -25,20 +25,18 @@ public class UserService {
     }
 
     public void createUser(String login) {
-        try {
-            loginValidation(login);
-
-            int userId = generateId();
-            List<Account> accounts = new ArrayList<>();
-            Account defaultAccount = accountService.createAccount(userId);
-            accounts.add(defaultAccount);
-            User user = new User(userId, login, accounts);
-            users.add(user);
-            System.out.println("User created: " + user);
-
-        } catch (IllegalStateException ex) {
-            System.out.println(ex.getMessage());
+        if (login == null || login.isEmpty()) {
+            throw new IllegalArgumentException("login can't be empty");
         }
+        loginValidation(login);
+
+        int userId = generateId();
+        List<Account> accounts = new ArrayList<>();
+        Account defaultAccount = accountService.createAccount(userId);
+        accounts.add(defaultAccount);
+        User user = new User(userId, login, accounts);
+        users.add(user);
+        System.out.println("User created: " + user);
     }
 
     public Account createAdditionalAccount(int userId) {

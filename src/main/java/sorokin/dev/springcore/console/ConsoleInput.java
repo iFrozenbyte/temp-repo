@@ -1,12 +1,7 @@
 package sorokin.dev.springcore.console;
 
 import org.springframework.stereotype.Component;
-
 import java.util.Scanner;
-
-/**
- * Единая точка чтения ввода
- */
 
 @Component
 public class ConsoleInput {
@@ -25,9 +20,14 @@ public class ConsoleInput {
     }
 
     public int readInt() {
-        int value = scanner.nextInt();
-        scanner.nextLine();
-        return value;
+        String line = readString();
+        if (line == null) {
+            throw new IllegalStateException("Input closed");
+        }
+        try {
+            return Integer.parseInt(line);
+        } catch (NumberFormatException e) {
+            throw  new IllegalArgumentException("invalid number " +  line);
+        }
     }
-
 }

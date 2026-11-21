@@ -86,7 +86,15 @@ public class OperationsConsoleListener {
     private void handleUserCreate() {
         System.out.println("Please input login:");
         String login = consoleInput.readString();
-        userService.createUser(login);
+        if (login == null) {
+            return;
+        }
+        try {
+            userService.createUser(login);
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            System.out.println(e.getMessage());
+        }
+
     }
 
     private void handleAccountCreate() {
@@ -95,72 +103,74 @@ public class OperationsConsoleListener {
             int userId = consoleInput.readInt();
             Account account = userService.createAdditionalAccount(userId);
             System.out.println("Account created: " + account);
-        } catch (IllegalStateException e) {
+        } catch (IllegalArgumentException | IllegalStateException e) {
             System.out.println(e.getMessage());
         }
 
     }
 
     private void handleDepositCreate() {
-        System.out.println("Please enter account id: ");
-        int accountId = consoleInput.readInt();
-
-        System.out.println("Please enter amount to be deposited: ");
-        int amount = consoleInput.readInt();
 
         try {
+            System.out.println("Please enter account id: ");
+            int accountId = consoleInput.readInt();
+
+            System.out.println("Please enter amount to be deposited: ");
+            int amount = consoleInput.readInt();
+
             accountService.setAccountDeposit(accountId, amount);
             System.out.println("Deposit completed successfully.");
-        } catch (IllegalStateException e) {
+        } catch (IllegalArgumentException | IllegalStateException e) {
             System.out.println(e.getMessage());
         }
 
     }
 
     private void handleWithdraw() {
-        System.out.println("input account id:");
-        int accountId = consoleInput.readInt(); // int accountId = consoleInput.readInt(6);
-
-        System.out.println("input amount to withdraw:");
-        int amount = consoleInput.readInt(); // int amount = consoleInput.readInt(7);
 
         try {
+            System.out.println("input account id:");
+            int accountId = consoleInput.readInt();
+
+            System.out.println("input amount to withdraw:");
+            int amount = consoleInput.readInt();
+
             accountService.setAccountWithdraw(accountId, amount);
             System.out.println("Withdrawal completed successfully.");
-        } catch (IllegalStateException e) {
+        } catch (IllegalArgumentException | IllegalStateException e) {
             System.out.println(e.getMessage());
         }
 
     }
 
     private void handleTransfer() {
-        System.out.println("Please input sender account id:");
-        int senderAccountId = consoleInput.readInt();
-
-        System.out.println("Please input recipient account id:");
-        int recipientAccountId = consoleInput.readInt();
-
-        System.out.println("Please input amount to be transferred:");
-        int amount = consoleInput.readInt();
 
         try {
+            System.out.println("Please input sender account id:");
+            int senderAccountId = consoleInput.readInt();
+
+            System.out.println("Please input recipient account id:");
+            int recipientAccountId = consoleInput.readInt();
+
+            System.out.println("Please input amount to be transferred:");
+            int amount = consoleInput.readInt();
+
             accountService.transferMoney(senderAccountId, recipientAccountId, amount);
             System.out.println("Transfer completed successfully.");
-        } catch (IllegalStateException e) {
+        } catch (IllegalArgumentException | IllegalStateException e) {
             System.out.println(e.getMessage());
         }
 
     }
 
     private void handleClose() {
-        System.out.println("Please input account id:");
-        int accountId = consoleInput.readInt();
         try {
+            System.out.println("Please input account id:");
+            int accountId = consoleInput.readInt();
             userService.closeAccount(accountId);
             System.out.println("Account closed successfully.");
-        } catch (IllegalStateException e) {
+        } catch (IllegalArgumentException | IllegalStateException e) {
             System.out.println(e.getMessage());
         }
-
     }
 }
