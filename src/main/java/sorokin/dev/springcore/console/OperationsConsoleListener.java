@@ -4,10 +4,9 @@ import org.springframework.stereotype.Component;
 import sorokin.dev.springcore.account.Account;
 import sorokin.dev.springcore.account.AccountService;
 import sorokin.dev.springcore.operations.OperationCommand;
-import sorokin.dev.springcore.user.User;
 import sorokin.dev.springcore.user.UserService;
 
-import java.util.Scanner;
+import static sorokin.dev.springcore.Constant.commands;
 
 /**
  * Слушает консольный ввод и вызывает нужные методы сервисов
@@ -32,31 +31,17 @@ public class OperationsConsoleListener {
     }
 
     public void startService() {
-
-        try (Scanner scanner = new Scanner(System.in)) {
-            System.out.println("> MiniBank started. Type 'EXIT' to stop.\n\nAvailable commands:\n" +
-                    "USER_CREATE, SHOW_ALL_USERS, ACCOUNT_CREATE, ACCOUNT_DEPOSIT,\n" +
-                    "ACCOUNT_WITHDRAW, ACCOUNT_TRANSFER, ACCOUNT_CLOSE, EXIT\n");
-            while (true) {
-                System.out.println("Enter command:");
-                if (!scanner.hasNextLine()) {
-                    break;
+        System.out.println("> MiniBank started. Type 'EXIT' to stop.");
+        while (true) {
+            try {
+                System.out.println("\nEnter command:\n" + commands);
+                String input = consoleInput.readString();
+                if (input == null || input.isEmpty()) {
+                    return;
                 }
+                OperationCommand operationCommand = OperationCommand.valueOf(input.trim().toUpperCase());
 
-                String line = scanner.nextLine().trim().toUpperCase();
-                if (line.isEmpty()) {
-                    continue;
-                }
-
-                OperationCommand command;
-                try {
-                    command = OperationCommand.valueOf(line);
-                } catch (IllegalArgumentException e) {
-                    System.out.println("Invalid input: " + line);
-                    continue;
-                }
-
-                switch (command) {
+                switch (operationCommand) {
                     case USER_CREATE:
                         handleUserCreate();
                         continue;
@@ -87,22 +72,27 @@ public class OperationsConsoleListener {
 
                     case EXIT:
                         return;
+
                     default:
                         System.out.println("Invalid input");
                 }
 
+            } catch (IllegalArgumentException e) {
+                System.out.println("Invalid input");
             }
         }
     }
 
     private void handleUserCreate() {
+        System.out.println("Please input login:");
         String login = consoleInput.readString();
         userService.createUser(login);
     }
 
     private void handleAccountCreate() {
         try {
-            int userId = consoleInput.readInt(1);
+            System.out.println("Please input user id:");
+            int userId = consoleInput.readInt();
             Account account = userService.createAdditionalAccount(userId);
             System.out.println("Account created: " + account);
         } catch (IllegalStateException e) {
@@ -112,8 +102,12 @@ public class OperationsConsoleListener {
     }
 
     private void handleDepositCreate() {
-        int accountId = consoleInput.readInt(2);
-        int amount = consoleInput.readInt(3);
+        System.out.println("Please enter account id: ");
+        int accountId = consoleInput.readInt();
+
+        System.out.println("Please enter amount to be deposited: ");
+        int amount = consoleInput.readInt();
+
         try {
             accountService.setAccountDeposit(accountId, amount);
             System.out.println("Deposit completed successfully.");
@@ -124,8 +118,12 @@ public class OperationsConsoleListener {
     }
 
     private void handleWithdraw() {
-        int accountId = consoleInput.readInt(6);
-        int amount = consoleInput.readInt(7);
+        System.out.println("input account id:");
+        int accountId = consoleInput.readInt(); // int accountId = consoleInput.readInt(6);
+
+        System.out.println("input amount to withdraw:");
+        int amount = consoleInput.readInt(); // int amount = consoleInput.readInt(7);
+
         try {
             accountService.setAccountWithdraw(accountId, amount);
             System.out.println("Withdrawal completed successfully.");
@@ -136,22 +134,29 @@ public class OperationsConsoleListener {
     }
 
     private void handleTransfer() {
-        int senderAccountId = consoleInput.readInt(4);
-        int receiverAccountId = consoleInput.readInt(5);
-        int amount = consoleInput.readInt(3);
+        System.out.println("Please input sender account id:");
+        int senderAccountId = consoleInput.readInt();
+
+        System.out.println("Please input recipient account id:");
+        int recipientAccountId = consoleInput.readInt();
+
+        System.out.println("Please input amount to be transferred:");
+        int amount = consoleInput.readInt();
 
         try {
-            accountService.transferMoney(senderAccountId, receiverAccountId, amount);
+            accountService.transferMoney(senderAccountId, recipientAccountId, amount);
+            System.out.println("Transfer completed successfully.");
         } catch (IllegalStateException e) {
             System.out.println(e.getMessage());
         }
-        System.out.println("Transfer completed successfully.");
+
     }
 
     private void handleClose() {
+        System.out.println("Please input account id:");
+        int accountId = consoleInput.readInt();
         try {
-            int accountId = consoleInput.readInt(2);
-            accountService.closeAccount(accountId);
+            userService.closeAccount(accountId);
             System.out.println("Account closed successfully.");
         } catch (IllegalStateException e) {
             System.out.println(e.getMessage());

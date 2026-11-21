@@ -26,17 +26,27 @@ public class AccountService {
     }
 
     public void setAccountDeposit(int accountId, double amount) {
+        if (amount <= 0) {
+            throw new IllegalStateException("Amount must be greater than zero.");
+        }
+
         if (!accounts.containsKey(accountId)) {
             throw new IllegalStateException("Account " + accountId + " not found.");
         }
+
         Account account = accounts.get(accountId);
         account.setMoneyAmount(account.getMoneyAmount() + amount);
     }
 
     public void setAccountWithdraw(int accountId, double amount) {
+        if (amount <= 0) {
+            throw new IllegalStateException("Amount must be greater than zero.");
+        }
+
         if (!accounts.containsKey(accountId)) {
             throw new IllegalStateException("Account " + accountId + " not found.");
         }
+
         Account account = accounts.get(accountId);
         if (!hasLimitWithDraw(account, amount)) {
             throw new IllegalStateException("Account " + accountId + " limit has been reached.");
@@ -46,6 +56,9 @@ public class AccountService {
 
     public void transferMoney(int fromAccountId, int toAccountId, int amount) {
         double totalAmount;
+        if (amount <= 0) {
+            throw new IllegalStateException("Amount must be greater than zero.");
+        }
         if (!accounts.containsKey(fromAccountId)) {
             throw new IllegalStateException("Sender account " + fromAccountId + " not found.");
         }
@@ -68,7 +81,7 @@ public class AccountService {
         setAccountDeposit(toAccountId, totalAmount);
     }
 
-    public void closeAccount(int accountId) {
+    public Account closeAccount(int accountId) {
         if (!accounts.containsKey(accountId)) {
             throw new IllegalStateException("Account " + accountId + " not found.");
         }
@@ -77,12 +90,13 @@ public class AccountService {
         if (accountList.size() == 1) {
             throw new IllegalStateException("Account " + accountId + " cannot be closed because it is the user's only account.");
         } else {
-            accounts.remove(accountId);
             accountList.remove(closableAccount);
             Account account = accountList.stream().min(Comparator.comparingInt(Account::getId)).orElse(null);
             account.setMoneyAmount(account.getMoneyAmount() + closableAccount.getMoneyAmount());
             closableAccount.setMoneyAmount(0);
+            accounts.remove(closableAccount.getId());
         }
+        return closableAccount;
     }
 
     private int generateId() {

@@ -53,6 +53,14 @@ public class UserService {
         return additionalAccount;
     }
 
+    public void closeAccount(int accountId) {
+        Account closebleAccount = accountService.closeAccount(accountId);
+        users.stream().
+                filter(user -> user.getId() == closebleAccount.getUserId())
+                .findFirst()
+                .ifPresent(user -> user.getAccountList().remove(closebleAccount));
+    }
+
     private void loginValidation(String login) {
         boolean exists = users.stream().anyMatch(user -> user.getLogin().equals(login));
         if (exists) {

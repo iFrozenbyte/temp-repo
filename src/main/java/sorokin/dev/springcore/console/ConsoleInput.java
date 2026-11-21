@@ -5,49 +5,29 @@ import org.springframework.stereotype.Component;
 import java.util.Scanner;
 
 /**
- * Единая точка чтения и валидации ввода
+ * Единая точка чтения ввода
  */
 
 @Component
 public class ConsoleInput {
-    private final Scanner scanner = new Scanner(System.in);
+    private final Scanner scanner;
+
+    public ConsoleInput(Scanner scanner) {
+        this.scanner = scanner;
+    }
 
     public String readString() {
-        System.out.println("Please enter your login: ");
+        System.out.print(">");
+        if (!scanner.hasNextLine()) {
+            return null;
+        }
         return scanner.nextLine();
     }
 
-    public int readInt(int inputType) {
-        return switch (inputType) {
-            case 1 -> {
-                System.out.println("Please enter user id: ");
-                yield scanner.nextInt();
-            }
-            case 2 -> {
-                System.out.println("Please enter account id: ");
-                yield scanner.nextInt();
-            }
-            case 3 -> {
-                System.out.println("Please enter amount to deposit: ");
-                yield scanner.nextInt();
-            }
-            case 4 -> {
-                System.out.println("Please enter sender account id: ");
-                yield scanner.nextInt();
-            }
-            case 5 -> {
-                System.out.println("Please enter receiver account id: ");
-                yield scanner.nextInt();
-            }
-            case 6 -> {
-                System.out.println("Please enter account to withdraw: ");
-                yield scanner.nextInt();
-            }
-            case 7 -> {
-                System.out.println("Please enter amount to withdraw: ");
-                yield scanner.nextInt();
-            }
-            default -> 0;
-        };
+    public int readInt() {
+        int value = scanner.nextInt();
+        scanner.nextLine();
+        return value;
     }
+
 }
