@@ -17,14 +17,11 @@ public class UserService {
         this.accountService = accountService;
     }
 
-    public void getUsers() {
-        if (users.isEmpty()) {
-            System.out.println("No users found");
-        }
-        users.forEach(System.out::println);
+    public List<User> getUsers() {
+        return users;
     }
 
-    public void createUser(String login) {
+    public User createUser(String login) {
         if (login == null || login.isEmpty()) {
             throw new IllegalArgumentException("login can't be empty");
         }
@@ -36,7 +33,8 @@ public class UserService {
         accounts.add(defaultAccount);
         User user = new User(userId, login, accounts);
         users.add(user);
-        System.out.println("User created: " + user);
+
+        return user;
     }
 
     public Account createAdditionalAccount(int userId) {

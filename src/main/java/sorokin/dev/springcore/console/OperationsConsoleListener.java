@@ -4,7 +4,10 @@ import org.springframework.stereotype.Component;
 import sorokin.dev.springcore.account.Account;
 import sorokin.dev.springcore.account.AccountService;
 import sorokin.dev.springcore.operations.OperationCommand;
+import sorokin.dev.springcore.user.User;
 import sorokin.dev.springcore.user.UserService;
+
+import java.util.List;
 
 import static sorokin.dev.springcore.Constant.commands;
 
@@ -47,7 +50,7 @@ public class OperationsConsoleListener {
                         continue;
 
                     case SHOW_ALL_USERS:
-                        userService.getUsers();
+                        getUsers();
                         continue;
 
                     case ACCOUNT_CREATE:
@@ -83,6 +86,14 @@ public class OperationsConsoleListener {
         }
     }
 
+    private void getUsers() {
+        List<User> users = userService.getUsers();
+        if (users.isEmpty()) {
+            System.out.println("No users found");
+        }
+        users.forEach(System.out::println);
+    }
+
     private void handleUserCreate() {
         System.out.println("Please input login:");
         String login = consoleInput.readString();
@@ -90,7 +101,8 @@ public class OperationsConsoleListener {
             return;
         }
         try {
-            userService.createUser(login);
+            User user = userService.createUser(login);
+            System.out.println("User created: " + user);
         } catch (IllegalArgumentException | IllegalStateException e) {
             System.out.println(e.getMessage());
         }
